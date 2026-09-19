@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 运行时产物：data/config.json 内含明文 API 密钥，绝不入库
+data/
+logs/
+
+# PyInstaller 打包产物
+build/
+dist/
+_internal/
+*.exe
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 临时与备份
+*.tmp
+*.bak
+*.backup
+_check_debug.log
