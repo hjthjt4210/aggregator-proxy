@@ -142,7 +142,7 @@ client = OpenAI(
 app.py                     入口：单实例锁、--startup / --selftest
 src/
   main_window.py           主窗口、托盘、导航、全局样式
-  api_server.py            FastAPI 应用、鉴权、调度、failover、冷却、流式转发
+  api_server.py            FastAPI 应用、鉴权、调度、failover、冷却、流式转发、接入地址计算
   config_manager.py        config.json 读写、原子保存、损坏恢复
   autostart.py             Windows 注册表开机自启
   logger.py                日志（约定：绝不写密钥）
@@ -152,7 +152,6 @@ src/
     upstreams_page.py      上游管理
     logs_page.py           实时日志
     settings_page.py       设置
-    overview_page.py       未接入导航的遗留页面；目前仅对外提供 api_display_host()
 ```
 
 技术栈：Python + PySide6（界面）+ FastAPI / uvicorn（内嵌 HTTP 服务，跑在 Qt 子线程）

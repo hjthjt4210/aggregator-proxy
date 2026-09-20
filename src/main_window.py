@@ -36,12 +36,11 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from .api_server import ApiServerController
+from .api_server import ApiServerController, api_display_host
 from .config_manager import ConfigManager
 from .logger import QtLogEmitter, setup_logging
 from .pages.groups_page import GroupsPage
 from .pages.logs_page import LogsPage
-from .pages.overview_page import api_display_host
 from .pages.settings_page import SettingsPage
 from .pages.upstreams_page import UpstreamsPage
 

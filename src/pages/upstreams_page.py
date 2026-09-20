@@ -17,12 +17,11 @@ from PySide6.QtWidgets import (
 )
 
 from ..api_server import (
-    check_group_now, check_upstream_now, get_cooldown_snapshot, get_health,
-    reorder_group_models, _model_entries,
+    api_display_host, check_group_now, check_upstream_now, get_cooldown_snapshot,
+    get_health, reorder_group_models, _model_entries,
 )
 from ..config_manager import ConfigManager
 from ..ui_widgets import NumberEdit, Spinner, ToggleSwitch
-from .overview_page import api_display_host
 
 logger = logging.getLogger("aggregator")
 

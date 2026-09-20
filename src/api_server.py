@@ -20,6 +20,7 @@
 from __future__ import annotations
 
 import logging
+import socket
 import threading
 import time
 from enum import IntEnum
@@ -33,6 +34,25 @@ from PySide6.QtCore import QObject, QThread, QTimer, Signal
 from .config_manager import ConfigManager
 
 logger = logging.getLogger("aggregator")
+
+
+def get_lan_ip() -> str:
+    """获取本机局域网 IP。失败时回退回环地址。"""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(2)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
+
+def api_display_host(cfg: dict) -> str:
+    """对外展示的接入主机名：通配监听时给局域网 IP，绑定具体地址时如实显示。"""
+    host = str(cfg.get("server", {}).get("host", "127.0.0.1")).strip()
+    return get_lan_ip() if host in ("0.0.0.0", "::") else (host or "127.0.0.1")
 
 
 # 健康状态只驻内存，避免把运行时状态写入含密钥的配置文件。
