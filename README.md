@@ -6,6 +6,8 @@
 
 一个桌面窗口管完，不需要装 Docker、不需要数据库、不需要反向代理。
 
+![上游管理界面](docs/screenshots/upstreams.png)
+
 > **费用提示**：本工具会代你调用上游并按 token 计费。健康检查是**真实请求**，
 > 每次探活都会产生费用。请不要在无人看管的情况下长期开启。
 > 本项目只提供软件，不附带任何 API 额度。
@@ -33,7 +35,7 @@
 
 ### 方式一：下载 EXE（Windows）
 
-到 [Releases](../../releases) 下载 `聚合代理.zip`，解压后运行 `聚合代理.exe`。
+到 [Releases](../../releases) 下载 `Aggregator-v1.2.0.zip`，解压后运行 `聚合代理.exe`。
 首次运行会在同级目录自动创建 `data/config.json` 与 `logs/`。
 
 ### 方式二：源码运行
