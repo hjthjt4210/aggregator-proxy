@@ -220,6 +220,7 @@ class _UvicornThread(QThread):
         self._host = host
         self._port = port
         self._server: Any = None
+        self.port_occupied = False  # 端口占用属配置问题，不该走自动重试
 
     def run(self) -> None:  # QThread 入口，运行直到 stopped
         try:
@@ -238,6 +239,7 @@ class _UvicornThread(QThread):
         except SystemExit:
             # uvicorn 绑定端口失败时会 sys.exit(1)；在 QThread 里必须拦住，
             # 否则 SystemExit 会把整个 GUI 进程一起带崩。
+            self.port_occupied = True
             message = f"端口 {self._port} 被占用"
             logger.error("API 服务启动失败：%s，请修改监听端口", message)
             self.failed.emit(message)
@@ -337,6 +339,7 @@ class ApiServerController(QObject):
     def _on_thread_finished(self) -> None:
         was_running = self._running
         self._running = False
+        port_occupied = bool(getattr(self._thread, "port_occupied", False)) if self._thread else False
         if self._pending_restart:
             self._pending_restart = False
             self.start()
@@ -347,6 +350,11 @@ class ApiServerController(QObject):
             self._stopping = False
             logger.info("API 服务已停止")
             self.log_message.emit("API 服务已停止")
+            self.state_changed.emit(False)
+            return
+        if port_occupied:
+            # 端口被占用是配置问题，重试不会有结果，保持停止状态等用户处理
+            logger.error("API 服务启动失败：端口被占用，已停止自动重试")
             self.state_changed.emit(False)
             return
         # 非主动停止：同端口延迟自动重启（端口保持不变）
@@ -523,9 +531,9 @@ class _FailoverContext:
         if not up.get("id"):
             return
         try:
-            seconds = float(self.cfg.get("server", {}).get("cooldown_seconds", 60))
+            seconds = float(self.cfg.get("server", {}).get("cooldown_seconds", 120))
         except (TypeError, ValueError):
-            seconds = 60.0
+            seconds = 120.0
         self.cooldowns[self._key(up)] = time.time() + seconds
         logger.debug("上游[%s/%s] 进入冷却 %.0fs", up.get("name"), up.get("model"), seconds)
 
@@ -551,7 +559,7 @@ async def _try_start_stream(client: httpx.AsyncClient, up: dict, body: dict):
 
 # ---------------------------------------------------------------- FastAPI app
 def create_app(config_manager: ConfigManager) -> FastAPI:
-    app = FastAPI(title="聚合代理", version="0.3.0")
+    app = FastAPI(title="聚合代理", version="1.2.0")
 
     # 运行时冷却状态，仅驻内存，不写入 config（config 含 API Key 敏感信息）。
     # 使用模块级 _cooldowns：GUI 可查询倒计时；重启服务后时间戳过期的条目自然失效。
